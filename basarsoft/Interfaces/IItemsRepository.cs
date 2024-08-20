@@ -3,15 +3,12 @@ using basarsoft.Models;
 
 namespace basarsoft.Interfaces
 {
-    public interface IItemsService<T> where T : class
+    public interface IItemsRepository<T> where T : class
     {
-        IEnumerable<T> GetAllItems();
-        T GetItemById(int id);
+        IEnumerable<Items> GetAllItems();
+        Items GetItemById(int id);
         void CreateItem(T item);
         void UpdateItem(int id, T item);
         void DeleteItem(int id);
     }
 }
-
-
-

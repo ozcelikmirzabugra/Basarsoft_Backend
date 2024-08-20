@@ -2,66 +2,58 @@ using System.Collections.Generic;
 using System.Linq;
 using basarsoft.Data;
 using basarsoft.Interfaces;
-using basarsoft.Models;
 using Microsoft.EntityFrameworkCore;
 
 namespace basarsoft.Services
 {
-    public class ItemsServices : IItemsService
+    public class ItemsServices<T> : IItemsService<T> where T : class
     {
         private readonly ApplicationDbContext _context;
+        private readonly DbSet<T> _dbSet;
 
         public ItemsServices(ApplicationDbContext context)
         {
             _context = context;
+            _dbSet = _context.Set<T>();
         }
 
-        public List<Items> GetAllItems()
+        public IEnumerable<T> GetAllItems()
         {
-            return _context.Items.ToList();
+            return _dbSet.ToList();
+            //return _dbSet.GetAllItems.ToList(); UOW kullaninca bu konuma gececek.
         }
 
-        public List<Items> GetItemById(int id)
+        public T GetItemById(int id)
         {
-            var item = _context.Items.Where(x => x.Id == id).ToList();
-            return item;
+            return _dbSet.Find(id);
         }
 
-        public List<Items> CreateItem(Items item)
+        public void CreateItem(T item)
         {
-            _context.Items.Add(item);
+            _dbSet.Add(item);
             _context.SaveChanges();
-            return _context.Items.ToList();
         }
 
-        public List<Items> UpdateItem(int id, Items itemDto)
+        public void UpdateItem(int id, T itemDto)
         {
-            var existingItem = _context.Items.FirstOrDefault(x => x.Id == id);
+            var existingItem = _dbSet.Find(id);
 
             if (existingItem != null)
             {
-                existingItem.Xcoordinate = itemDto.Xcoordinate;
-                existingItem.Ycoordinate = itemDto.Ycoordinate;
-                existingItem.Name = itemDto.Name;
-                existingItem.Description = itemDto.Description;
-
+                _context.Entry(existingItem).CurrentValues.SetValues(itemDto);
                 _context.SaveChanges();
             }
-
-            return _context.Items.ToList();
         }
 
-        public List<Items> DeleteItem(int id)
+        public void DeleteItem(int id)
         {
-            var item = _context.Items.FirstOrDefault(x => x.Id == id);
+            var item = _dbSet.Find(id);
 
             if (item != null)
             {
-                _context.Items.Remove(item);
+                _dbSet.Remove(item);
                 _context.SaveChanges();
             }
-
-            return _context.Items.ToList();
         }
     }
 }

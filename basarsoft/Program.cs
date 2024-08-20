@@ -1,5 +1,6 @@
 using basarsoft.Data;
 using basarsoft.Interfaces;
+using basarsoft.Models;
 using basarsoft.Services;
 using Microsoft.EntityFrameworkCore;
 
@@ -11,7 +12,7 @@ builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
 // builder.Services.AddScoped<IItemsServices, ItemsServices>();
-builder.Services.AddScoped(typeof(IItemsService), typeof(ItemsServices));
+builder.Services.AddScoped(typeof(IItemsService<Items>), typeof(ItemsServices<Items>));
 
 
 builder.Services.AddDbContext<ApplicationDbContext>(options =>

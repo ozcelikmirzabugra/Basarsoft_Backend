@@ -1,158 +1,194 @@
-using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
-using basarsoft.Data;
-using basarsoft.Models;
-using basarsoft.Services;
 using basarsoft.Interfaces;
+using basarsoft.Models;
 
 namespace basarsoft.Controllers
 {
+    [Route("api/[controller]")]
     [ApiController]
-    [Route("api/items")]
     public class HomeController : ControllerBase
     {
-        private readonly IItemsService _itemsService;
+        private readonly IItemsService<Items> _itemsService;
 
-        public HomeController(ApplicationDbContext context, IItemsService itemsService)
+        public HomeController(IItemsService<Items> itemsService)
         {
             _itemsService = itemsService;
         }
 
-        [HttpGet()]
+        [HttpGet]
         public Response GetAllItems()
         {
-            var result = new Response();
             try
             {
-                result.Data = _itemsService.GetAllItems();
-                result.Success = true;
-                result.Message = "Items retrieved successfully.";
-                result.StatusCode = 200; // OK
+                var items = _itemsService.GetAllItems();
+                return new Response
+                {
+                    Success = true,
+                    Message = "Items retrieved successfully.",
+                    StatusCode = 200,
+                    Data = items
+                };
             }
             catch (Exception ex)
             {
-                result.Success = false;
-                result.Message = $"Error retrieving items: {ex.Message}";
-                result.StatusCode = 500; // Internal Server Error
+                return new Response
+                {
+                    Success = false,
+                    Message = $"An error occurred: {ex.Message}",
+                    StatusCode = 500,
+                    Data = null
+                };
             }
-            return result;
         }
 
         [HttpGet("{id}")]
-        public Response GetItem(int id)
+        public Response GetItemById(int id)
         {
-            var result = new Response();
             try
             {
-                var items = _itemsService.GetItemById(id);
-                if (items.Any())
+                var item = _itemsService.GetItemById(id);
+                if (item == null)
                 {
-                    result.Data = items;
-                    result.Success = true;
-                    result.Message = "Item retrieved successfully.";
-                    // Islerin duzgun calistigini belirtir 
-                    result.StatusCode = 200;
+                    return new Response
+                    {
+                        Success = false,
+                        Message = "Item not found.",
+                        StatusCode = 404,
+                        Data = null
+                    };
                 }
-                else
+
+                return new Response
                 {
-                    result.Success = false;
-                    result.Message = "Item not found.";
-                    // Not Found zaten
-                    result.StatusCode = 404;
-                }
+                    Success = true,
+                    Message = "Item retrieved successfully.",
+                    StatusCode = 200,
+                    Data = item
+                };
             }
             catch (Exception ex)
             {
-                result.Success = false;
-                result.Message = $"Error retrieving item: {ex.Message}";
-                // Internal Server Error
-                result.StatusCode = 500;
+                return new Response
+                {
+                    Success = false,
+                    Message = $"An error occurred: {ex.Message}",
+                    StatusCode = 500,
+                    Data = null
+                };
             }
-            return result;
         }
 
-        [HttpPost()]
-        public Response CreateItem(Items obj)
+        [HttpPost]
+        public Response CreateItem([FromBody] Items item)
         {
-            var result = new Response();
             try
             {
-                result.Data = _itemsService.CreateItem(obj);
-                result.Success = true;
-                result.Message = "Item created successfully.";
-                result.StatusCode = 201; // Created
+                if (item == null)
+                {
+                    return new Response
+                    {
+                        Success = false,
+                        Message = "Invalid item data.",
+                        StatusCode = 400,
+                        Data = null
+                    };
+                }
+
+                _itemsService.CreateItem(item);
+                return new Response
+                {
+                    Success = true,
+                    Message = "Item created successfully.",
+                    StatusCode = 201,
+                    Data = item
+                };
             }
             catch (Exception ex)
             {
-                result.Success = false;
-                result.Message = $"Error creating item: {ex.Message}";
-                result.StatusCode = 500; // Internal Server Error
+                return new Response
+                {
+                    Success = false,
+                    Message = $"An error occurred: {ex.Message}",
+                    StatusCode = 500,
+                    Data = null
+                };
             }
-            return result;
         }
 
         [HttpPut("{id}")]
-        public Response UpdateItem(int id, [FromBody] Items obj)
+        public Response UpdateItem(int id, [FromBody] Items itemDto)
         {
-            var result = new Response();
             try
             {
-                var updatedItems = _itemsService.UpdateItem(id, obj);
-                if (updatedItems.Any())
+                if (itemDto == null || id != itemDto.Id)
                 {
-                    result.Data = updatedItems;
-                    result.Success = true;
-                    result.Message = "Item updated successfully.";
-                    result.StatusCode = 200; // OK
+                    return new Response
+                    {
+                        Success = false,
+                        Message = "Invalid item data or ID mismatch.",
+                        StatusCode = 400,
+                        Data = null
+                    };
                 }
-                else
+
+                _itemsService.UpdateItem(id, itemDto);
+                return new Response
                 {
-                    result.Success = false;
-                    result.Message = "Item not found for update.";
-                    result.StatusCode = 404; // Not Found
-                }
+                    Success = true,
+                    Message = "Item updated successfully.",
+                    StatusCode = 204, // NoContent response
+                    Data = null
+                };
             }
             catch (Exception ex)
             {
-                result.Success = false;
-                result.Message = $"Error updating item: {ex.Message}";
-                result.StatusCode = 500; // Internal Server Error
+                return new Response
+                {
+                    Success = false,
+                    Message = $"An error occurred: {ex.Message}",
+                    StatusCode = 500,
+                    Data = null
+                };
             }
-            return result;
         }
 
         [HttpDelete("{id}")]
         public Response DeleteItem(int id)
         {
-            var result = new Response();
             try
             {
-                var remainingItems = _itemsService.DeleteItem(id);
-                if (remainingItems.Any())
+                var item = _itemsService.GetItemById(id);
+                if (item == null)
                 {
-                    result.Data = remainingItems;
-                    result.Success = true;
-                    result.Message = "Item deleted successfully.";
-                    result.StatusCode = 200; // OK
+                    return new Response
+                    {
+                        Success = false,
+                        Message = "Item not found.",
+                        StatusCode = 404,
+                        Data = null
+                    };
                 }
-                else
+
+                _itemsService.DeleteItem(id);
+                return new Response
                 {
-                    result.Success = false;
-                    result.Message = "Item not found for deletion.";
-                     // Not Found
-                    result.StatusCode = 404;
-                }
+                    Success = true,
+                    Message = "Item deleted successfully.",
+                    StatusCode = 204, // NoContent response
+                    Data = null
+                };
             }
             catch (Exception ex)
             {
-                result.Success = false;
-                result.Message = $"Error deleting item: {ex.Message}";
-                result.StatusCode = 500; // Internal Server Error
+                return new Response
+                {
+                    Success = false,
+                    Message = $"An error occurred: {ex.Message}",
+                    StatusCode = 500,
+                    Data = null
+                };
             }
-            return result;
         }
     }
 }
