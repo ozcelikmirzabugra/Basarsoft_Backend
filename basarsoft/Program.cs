@@ -12,7 +12,11 @@ builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
 // builder.Services.AddScoped<IItemsServices, ItemsServices>();
-builder.Services.AddScoped(typeof(IItemsService<Items>), typeof(ItemsServices<Items>));
+// builder.Services.AddScoped(typeof(IItemsService<Items>), typeof(ItemsServices<Items>));
+
+builder.Services.AddScoped(typeof(IRepository<>), typeof(Repository<>));
+builder.Services.AddScoped<IItemsService<Items>, ItemsService>();
+
 
 
 builder.Services.AddDbContext<ApplicationDbContext>(options =>

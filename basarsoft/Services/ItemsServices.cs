@@ -1,59 +1,45 @@
 using System.Collections.Generic;
-using System.Linq;
-using basarsoft.Data;
 using basarsoft.Interfaces;
-using Microsoft.EntityFrameworkCore;
+using basarsoft.Models;
 
 namespace basarsoft.Services
 {
-    public class ItemsServices<T> : IItemsService<T> where T : class
+    public class ItemsService : IItemsService<Items>
     {
-        private readonly ApplicationDbContext _context;
-        private readonly DbSet<T> _dbSet;
+        private readonly IRepository<Items> _repository;
 
-        public ItemsServices(ApplicationDbContext context)
+        public ItemsService(IRepository<Items> repository)
         {
-            _context = context;
-            _dbSet = _context.Set<T>();
+            _repository = repository;
         }
 
-        public IEnumerable<T> GetAllItems()
+        public IEnumerable<Items> GetAllItems()
         {
-            return _dbSet.ToList();
-            //return _dbSet.GetAllItems.ToList(); UOW kullaninca bu konuma gececek.
+            return _repository.GetAll();
         }
 
-        public T GetItemById(int id)
+        public Items GetItemById(int id)
         {
-            return _dbSet.Find(id);
+            return _repository.GetById(id);
         }
 
-        public void CreateItem(T item)
+        public void CreateItem(Items item)
         {
-            _dbSet.Add(item);
-            _context.SaveChanges();
+            _repository.Add(item);
         }
 
-        public void UpdateItem(int id, T itemDto)
+        public void UpdateItem(int id, Items itemDto)
         {
-            var existingItem = _dbSet.Find(id);
-
+            var existingItem = _repository.GetById(id);
             if (existingItem != null)
             {
-                _context.Entry(existingItem).CurrentValues.SetValues(itemDto);
-                _context.SaveChanges();
+                _repository.Update(itemDto);
             }
         }
 
         public void DeleteItem(int id)
         {
-            var item = _dbSet.Find(id);
-
-            if (item != null)
-            {
-                _dbSet.Remove(item);
-                _context.SaveChanges();
-            }
+            _repository.Delete(id);
         }
     }
 }
