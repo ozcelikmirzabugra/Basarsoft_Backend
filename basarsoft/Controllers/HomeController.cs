@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using basarsoft.Interfaces;
 using basarsoft.Models;
@@ -9,185 +10,173 @@ namespace basarsoft.Controllers
     [ApiController]
     public class HomeController : ControllerBase
     {
-        private readonly IItemsService<Items> _itemsService;
+        private readonly IItemsServices<Items> _itemsService;
 
-        public HomeController(IItemsService<Items> itemsService)
+        public HomeController(IItemsServices<Items> itemsService)
         {
             _itemsService = itemsService;
         }
 
         [HttpGet]
-        public Response GetAllItems()
+        public async Task<IActionResult> GetAllItems()
         {
             try
             {
-                var items = _itemsService.GetAllItems();
-                return new Response
+                var items = await _itemsService.GetAllItemsAsync();
+                return Ok(new Response
                 {
                     Success = true,
                     Message = "Items retrieved successfully.",
                     StatusCode = 200,
                     Data = items
-                };
+                });
             }
-            catch (Exception ex)
+            catch (System.Exception ex)
             {
-                return new Response
+                return StatusCode(500, new Response
                 {
                     Success = false,
                     Message = $"An error occurred: {ex.Message}",
                     StatusCode = 500,
                     Data = null
-                };
+                });
             }
         }
 
         [HttpGet("{id}")]
-        public Response GetItemById(int id)
+        public async Task<IActionResult> GetItemById(int id)
         {
             try
             {
-                var item = _itemsService.GetItemById(id);
+                var item = await _itemsService.GetItemByIdAsync(id);
                 if (item == null)
                 {
-                    return new Response
+                    return NotFound(new Response
                     {
                         Success = false,
                         Message = "Item not found.",
                         StatusCode = 404,
                         Data = null
-                    };
+                    });
                 }
 
-                return new Response
+                return Ok(new Response
                 {
                     Success = true,
                     Message = "Item retrieved successfully.",
                     StatusCode = 200,
                     Data = item
-                };
+                });
             }
-            catch (Exception ex)
+            catch (System.Exception ex)
             {
-                return new Response
+                return StatusCode(500, new Response
                 {
                     Success = false,
                     Message = $"An error occurred: {ex.Message}",
                     StatusCode = 500,
                     Data = null
-                };
+                });
             }
         }
 
         [HttpPost]
-        public Response CreateItem([FromBody] Items item)
+        public async Task<IActionResult> CreateItem([FromBody] Items item)
         {
             try
             {
                 if (item == null)
                 {
-                    return new Response
+                    return BadRequest(new Response
                     {
                         Success = false,
                         Message = "Invalid item data.",
                         StatusCode = 400,
                         Data = null
-                    };
+                    });
                 }
 
-                _itemsService.CreateItem(item);
-                return new Response
+                await _itemsService.AddItemAsync(item);
+                return CreatedAtAction(nameof(GetItemById), new { id = item.Id }, new Response
                 {
                     Success = true,
                     Message = "Item created successfully.",
                     StatusCode = 201,
                     Data = item
-                };
+                });
             }
-            catch (Exception ex)
+            catch (System.Exception ex)
             {
-                return new Response
+                return StatusCode(500, new Response
                 {
                     Success = false,
                     Message = $"An error occurred: {ex.Message}",
                     StatusCode = 500,
                     Data = null
-                };
+                });
             }
         }
 
         [HttpPut("{id}")]
-        public Response UpdateItem(int id, [FromBody] Items itemDto)
+        public async Task<IActionResult> UpdateItem(int id, [FromBody] Items item)
         {
             try
             {
-                if (itemDto == null || id != itemDto.Id)
+                if (item == null || id != item.Id)
                 {
-                    return new Response
+                    return BadRequest(new Response
                     {
                         Success = false,
                         Message = "Invalid item data or ID mismatch.",
                         StatusCode = 400,
                         Data = null
-                    };
+                    });
                 }
 
-                _itemsService.UpdateItem(id, itemDto);
-                return new Response
-                {
-                    Success = true,
-                    Message = "Item updated successfully.",
-                    StatusCode = 204, // NoContent response
-                    Data = null
-                };
+                await _itemsService.UpdateItemAsync(item);
+                return NoContent();
             }
-            catch (Exception ex)
+            catch (System.Exception ex)
             {
-                return new Response
+                return StatusCode(500, new Response
                 {
                     Success = false,
                     Message = $"An error occurred: {ex.Message}",
                     StatusCode = 500,
                     Data = null
-                };
+                });
             }
         }
 
         [HttpDelete("{id}")]
-        public Response DeleteItem(int id)
+        public async Task<IActionResult> DeleteItem(int id)
         {
             try
             {
-                var item = _itemsService.GetItemById(id);
+                var item = await _itemsService.GetItemByIdAsync(id);
                 if (item == null)
                 {
-                    return new Response
+                    return NotFound(new Response
                     {
                         Success = false,
                         Message = "Item not found.",
                         StatusCode = 404,
                         Data = null
-                    };
+                    });
                 }
 
-                _itemsService.DeleteItem(id);
-                return new Response
-                {
-                    Success = true,
-                    Message = "Item deleted successfully.",
-                    StatusCode = 204, // NoContent response
-                    Data = null
-                };
+                await _itemsService.DeleteItemAsync(id);
+                return NoContent();
             }
-            catch (Exception ex)
+            catch (System.Exception ex)
             {
-                return new Response
+                return StatusCode(500, new Response
                 {
                     Success = false,
                     Message = $"An error occurred: {ex.Message}",
                     StatusCode = 500,
                     Data = null
-                };
+                });
             }
         }
     }

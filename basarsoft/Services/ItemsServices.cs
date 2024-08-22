@@ -1,45 +1,57 @@
 using System.Collections.Generic;
+using System.Threading.Tasks;
+using basarsoft.Controllers;
+using basarsoft.Data;
 using basarsoft.Interfaces;
+using basarsoft.Migrations;
 using basarsoft.Models;
+using basarsoft.Services;
+using basarsoft.UnitOfWork;
+using System.Collections.Generic;
+using System.Threading.Tasks;
+
 
 namespace basarsoft.Services
 {
-    public class ItemsService : IItemsService<Items>
+    public class ItemsServices : IItemsServices<Items>
     {
-        private readonly IRepository<Items> _repository;
+        private readonly IUnitOfWork _unitOfWork;
 
-        public ItemsService(IRepository<Items> repository)
+        public ItemsServices(IUnitOfWork unitOfWork)
         {
-            _repository = repository;
+            _unitOfWork = unitOfWork;
         }
 
-        public IEnumerable<Items> GetAllItems()
+        public async Task<IEnumerable<Items>> GetAllItemsAsync()
         {
-            return _repository.GetAll();
+            return await _unitOfWork.Repository<Items>().GetAllAsync();
         }
 
-        public Items GetItemById(int id)
+        public async Task<Items> GetItemByIdAsync(int id)
         {
-            return _repository.GetById(id);
+            return await _unitOfWork.Repository<Items>().GetByIdAsync(id);
         }
 
-        public void CreateItem(Items item)
+        public async Task AddItemAsync(Items item)
         {
-            _repository.Add(item);
+            await _unitOfWork.Repository<Items>().AddAsync(item);
+            await _unitOfWork.CommitAsync();
         }
 
-        public void UpdateItem(int id, Items itemDto)
+        public async Task UpdateItemAsync(Items item)
         {
-            var existingItem = _repository.GetById(id);
-            if (existingItem != null)
+            _unitOfWork.Repository<Items>().Update(item);
+            await _unitOfWork.CommitAsync();
+        }
+
+        public async Task DeleteItemAsync(int id)
+        {
+            var item = await _unitOfWork.Repository<Items>().GetByIdAsync(id);
+            if (item != null)
             {
-                _repository.Update(itemDto);
+                _unitOfWork.Repository<Items>().Remove(item);
+                await _unitOfWork.CommitAsync();
             }
-        }
-
-        public void DeleteItem(int id)
-        {
-            _repository.Delete(id);
         }
     }
 }

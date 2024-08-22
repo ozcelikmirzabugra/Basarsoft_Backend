@@ -2,6 +2,7 @@ using basarsoft.Data;
 using basarsoft.Interfaces;
 using basarsoft.Models;
 using basarsoft.Services;
+using basarsoft.UnitOfWork;
 using Microsoft.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -11,13 +12,9 @@ builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
-// builder.Services.AddScoped<IItemsServices, ItemsServices>();
-// builder.Services.AddScoped(typeof(IItemsService<Items>), typeof(ItemsServices<Items>));
-
 builder.Services.AddScoped(typeof(IRepository<>), typeof(Repository<>));
-builder.Services.AddScoped<IItemsService<Items>, ItemsService>();
-
-
+builder.Services.AddScoped<IItemsServices<Items>, ItemsServices>();
+builder.Services.AddScoped<IUnitOfWork, UnitOfWork>();
 
 builder.Services.AddDbContext<ApplicationDbContext>(options =>
     options.UseNpgsql(builder.Configuration.GetConnectionString("DefaultConnection")));

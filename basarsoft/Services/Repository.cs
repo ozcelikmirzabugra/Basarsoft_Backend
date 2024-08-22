@@ -1,52 +1,48 @@
 using System.Collections.Generic;
-using System.Linq;
+using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
-using basarsoft.Interfaces;
+using basarsoft.Controllers;
 using basarsoft.Data;
+using basarsoft.Interfaces;
+using basarsoft.Migrations;
+using basarsoft.Models;
+using basarsoft.Services;
+using basarsoft.UnitOfWork;
 
 namespace basarsoft.Services
 {
     public class Repository<T> : IRepository<T> where T : class
     {
-        private readonly ApplicationDbContext _context;
-        private readonly DbSet<T> _dbSet;
+        protected readonly ApplicationDbContext _context;
 
         public Repository(ApplicationDbContext context)
         {
             _context = context;
-            _dbSet = _context.Set<T>();
         }
 
-        public IEnumerable<T> GetAll()
+        public async Task<IEnumerable<T>> GetAllAsync()
         {
-            return _dbSet.AsEnumerable();
+            return await _context.Set<T>().ToListAsync();
         }
 
-        public T GetById(int id)
+        public async Task<T> GetByIdAsync(int id)
         {
-            return _dbSet.Find(id);
+            return await _context.Set<T>().FindAsync(id);
         }
 
-        public void Add(T entity)
+        public async Task AddAsync(T entity)
         {
-            _dbSet.Add(entity);
-            _context.SaveChanges();
+            await _context.Set<T>().AddAsync(entity);
         }
 
         public void Update(T entity)
         {
-            _dbSet.Update(entity);
-            _context.SaveChanges();
+            _context.Set<T>().Update(entity);
         }
 
-        public void Delete(int id)
+        public void Remove(T entity)
         {
-            var entity = _dbSet.Find(id);
-            if (entity != null)
-            {
-                _dbSet.Remove(entity);
-                _context.SaveChanges();
-            }
+            _context.Set<T>().Remove(entity);
         }
     }
 }
