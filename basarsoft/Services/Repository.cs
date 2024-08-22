@@ -19,7 +19,7 @@ namespace basarsoft.Services
 
         public IEnumerable<T> GetAll()
         {
-            return _dbSet.ToList();
+            return _dbSet.AsEnumerable();
         }
 
         public T GetById(int id)

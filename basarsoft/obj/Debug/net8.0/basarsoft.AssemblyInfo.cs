@@ -13,7 +13,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("basarsoft")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+99fb380fac7352d9297e7e6d5d5ff8a27ae80d44")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+9b375ef8927aa8cafb6496ad9f43ddd93e390682")]
 [assembly: System.Reflection.AssemblyProductAttribute("basarsoft")]
 [assembly: System.Reflection.AssemblyTitleAttribute("basarsoft")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]
