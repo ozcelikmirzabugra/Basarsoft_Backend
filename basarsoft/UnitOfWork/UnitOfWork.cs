@@ -2,7 +2,7 @@ using System.Threading.Tasks;
 using basarsoft.Controllers;
 using basarsoft.Data;
 using basarsoft.Interfaces;
-using basarsoft.Migrations;
+// using basarsoft.Migrations;
 using basarsoft.Models;
 using basarsoft.Services;
 using basarsoft.UnitOfWork;

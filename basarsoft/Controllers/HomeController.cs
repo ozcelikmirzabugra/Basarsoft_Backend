@@ -10,25 +10,25 @@ namespace basarsoft.Controllers
     [ApiController]
     public class HomeController : ControllerBase
     {
-        private readonly IItemsServices<Items> _itemsService;
+        private readonly ICoordinatesServices<Coordinates> _coordinatesService;
 
-        public HomeController(IItemsServices<Items> itemsService)
+        public HomeController(ICoordinatesServices<Coordinates> coordinatesService)
         {
-            _itemsService = itemsService;
+            _coordinatesService = coordinatesService;
         }
 
         [HttpGet]
-        public async Task<IActionResult> GetAllItems()
+        public async Task<IActionResult> GetAllCoordinates()
         {
             try
             {
-                var items = await _itemsService.GetAllItemsAsync();
+                var coordinates = await _coordinatesService.GetAllCoordinatesAsync();
                 return Ok(new Response
                 {
                     Success = true,
-                    Message = "Items retrieved successfully.",
+                    Message = "Coordinates retrieved successfully.",
                     StatusCode = 200,
-                    Data = items
+                    Data = coordinates
                 });
             }
             catch (System.Exception ex)
@@ -44,17 +44,17 @@ namespace basarsoft.Controllers
         }
 
         [HttpGet("{id}")]
-        public async Task<IActionResult> GetItemById(int id)
+        public async Task<IActionResult> GetCoordinateById(int id)
         {
             try
             {
-                var item = await _itemsService.GetItemByIdAsync(id);
-                if (item == null)
+                var coordinate = await _coordinatesService.GetCoordinateByIdAsync(id);
+                if (coordinate == null)
                 {
                     return NotFound(new Response
                     {
                         Success = false,
-                        Message = "Item not found.",
+                        Message = "Coordinates not found.",
                         StatusCode = 404,
                         Data = null
                     });
@@ -63,9 +63,9 @@ namespace basarsoft.Controllers
                 return Ok(new Response
                 {
                     Success = true,
-                    Message = "Item retrieved successfully.",
+                    Message = "Coordinates retrieved successfully.",
                     StatusCode = 200,
-                    Data = item
+                    Data = coordinate
                 });
             }
             catch (System.Exception ex)
@@ -81,29 +81,23 @@ namespace basarsoft.Controllers
         }
 
         [HttpPost]
-        public async Task<IActionResult> CreateItem([FromBody] Items item)
+        public async Task<IActionResult> CreateCoordinate([FromBody] Coordinates coordinate)
         {
             try
             {
-                if (item == null)
+                if (coordinate == null)
                 {
                     return BadRequest(new Response
                     {
                         Success = false,
-                        Message = "Invalid item data.",
+                        Message = "Invalid coordinate data.",
                         StatusCode = 400,
                         Data = null
                     });
                 }
 
-                await _itemsService.AddItemAsync(item);
-                return CreatedAtAction(nameof(GetItemById), new { id = item.Id }, new Response
-                {
-                    Success = true,
-                    Message = "Item created successfully.",
-                    StatusCode = 201,
-                    Data = item
-                });
+                await _coordinatesService.AddCoordinateAsync(coordinate);
+                return CreatedAtAction(nameof(GetCoordinateById), new { id = coordinate.Id }, coordinate);
             }
             catch (System.Exception ex)
             {
@@ -118,22 +112,22 @@ namespace basarsoft.Controllers
         }
 
         [HttpPut("{id}")]
-        public async Task<IActionResult> UpdateItem(int id, [FromBody] Items item)
+        public async Task<IActionResult> UpdateCoordinate(int id, [FromBody] Coordinates coordinate)
         {
             try
             {
-                if (item == null || id != item.Id)
+                if (coordinate == null || id != coordinate.Id)
                 {
                     return BadRequest(new Response
                     {
                         Success = false,
-                        Message = "Invalid item data or ID mismatch.",
+                        Message = "Invalid coordinates data or ID mismatch.",
                         StatusCode = 400,
                         Data = null
                     });
                 }
 
-                await _itemsService.UpdateItemAsync(item);
+                await _coordinatesService.UpdateCoordinateAsync(coordinate);
                 return NoContent();
             }
             catch (System.Exception ex)
@@ -149,23 +143,23 @@ namespace basarsoft.Controllers
         }
 
         [HttpDelete("{id}")]
-        public async Task<IActionResult> DeleteItem(int id)
+        public async Task<IActionResult> DeleteCoordinate(int id)
         {
             try
             {
-                var item = await _itemsService.GetItemByIdAsync(id);
-                if (item == null)
+                var coordinate = await _coordinatesService.GetCoordinateByIdAsync(id);
+                if (coordinate == null)
                 {
                     return NotFound(new Response
                     {
                         Success = false,
-                        Message = "Item not found.",
+                        Message = "Coordinate not found.",
                         StatusCode = 404,
                         Data = null
                     });
                 }
 
-                await _itemsService.DeleteItemAsync(id);
+                await _coordinatesService.DeleteCoordinateAsync(id);
                 return NoContent();
             }
             catch (System.Exception ex)

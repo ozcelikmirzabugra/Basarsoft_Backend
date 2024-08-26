@@ -7,13 +7,26 @@ using Microsoft.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);
 
+// Add CORS policy
+builder.Services.AddCors(options =>
+{
+    options.AddPolicy("AllowSpecificOrigin",
+        builder =>
+        {
+            builder.WithOrigins("http://127.0.0.1:5500")  // Frontend uygulamanızın adresi
+                   .AllowAnyHeader()
+                   .AllowAnyMethod();
+        });
+});
+
 // Add services to the container.
 builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
 builder.Services.AddScoped(typeof(IRepository<>), typeof(Repository<>));
-builder.Services.AddScoped<IItemsServices<Items>, ItemsServices>();
+// builder.Services.AddScoped<IItemsServices<Items>, ItemsServices>();
+builder.Services.AddScoped<ICoordinatesServices<Coordinates>, CoordinatesServices>();
 builder.Services.AddScoped<IUnitOfWork, UnitOfWork>();
 
 builder.Services.AddDbContext<ApplicationDbContext>(options =>
@@ -29,6 +42,11 @@ if (app.Environment.IsDevelopment())
 }
 
 app.UseHttpsRedirection();
+
+// Apply CORS policy
+app.UseCors("AllowSpecificOrigin");
+
+app.UseAuthorization();
 
 app.MapControllers();
 

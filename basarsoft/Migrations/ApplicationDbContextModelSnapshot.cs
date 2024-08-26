@@ -21,7 +21,7 @@ namespace basarsoft.Migrations
 
             NpgsqlModelBuilderExtensions.UseIdentityByDefaultColumns(modelBuilder);
 
-            modelBuilder.Entity("basarsoft.Models.Items", b =>
+            modelBuilder.Entity("basarsoft.Models.Coordinates", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -29,23 +29,19 @@ namespace basarsoft.Migrations
 
                     NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
 
-                    b.Property<string>("Description")
-                        .IsRequired()
-                        .HasColumnType("text");
-
                     b.Property<string>("Name")
                         .IsRequired()
                         .HasColumnType("text");
 
-                    b.Property<double>("Xcoordinate")
+                    b.Property<double>("XCoordinate")
                         .HasColumnType("double precision");
 
-                    b.Property<double>("Ycoordinate")
+                    b.Property<double>("YCoordinate")
                         .HasColumnType("double precision");
 
                     b.HasKey("Id");
 
-                    b.ToTable("Items");
+                    b.ToTable("Coordinates");
                 });
 #pragma warning restore 612, 618
         }
