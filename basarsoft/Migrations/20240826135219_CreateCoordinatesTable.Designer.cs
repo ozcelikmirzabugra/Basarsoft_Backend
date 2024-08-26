@@ -11,8 +11,8 @@ using basarsoft.Data;
 namespace basarsoft.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20240825121235_InitialMigrationCoordinate")]
-    partial class InitialMigrationCoordinate
+    [Migration("20240826135219_CreateCoordinatesTable")]
+    partial class CreateCoordinatesTable
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -36,11 +36,9 @@ namespace basarsoft.Migrations
                         .IsRequired()
                         .HasColumnType("text");
 
-                    b.Property<double>("XCoordinate")
-                        .HasColumnType("double precision");
-
-                    b.Property<double>("YCoordinate")
-                        .HasColumnType("double precision");
+                    b.Property<string>("WKT")
+                        .IsRequired()
+                        .HasColumnType("text");
 
                     b.HasKey("Id");
 

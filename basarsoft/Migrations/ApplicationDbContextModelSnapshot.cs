@@ -33,11 +33,9 @@ namespace basarsoft.Migrations
                         .IsRequired()
                         .HasColumnType("text");
 
-                    b.Property<double>("XCoordinate")
-                        .HasColumnType("double precision");
-
-                    b.Property<double>("YCoordinate")
-                        .HasColumnType("double precision");
+                    b.Property<string>("WKT")
+                        .IsRequired()
+                        .HasColumnType("text");
 
                     b.HasKey("Id");
 

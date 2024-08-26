@@ -6,7 +6,7 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace basarsoft.Migrations
 {
     /// <inheritdoc />
-    public partial class InitialMigrationCoordinate : Migration
+    public partial class CreateCoordinatesTable : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -17,8 +17,7 @@ namespace basarsoft.Migrations
                 {
                     Id = table.Column<int>(type: "integer", nullable: false)
                         .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
-                    XCoordinate = table.Column<double>(type: "double precision", nullable: false),
-                    YCoordinate = table.Column<double>(type: "double precision", nullable: false),
+                    WKT = table.Column<string>(type: "text", nullable: false),
                     Name = table.Column<string>(type: "text", nullable: false)
                 },
                 constraints: table =>
