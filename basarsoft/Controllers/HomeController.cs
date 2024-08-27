@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using basarsoft.Interfaces;
@@ -23,13 +24,17 @@ namespace basarsoft.Controllers
             try
             {
                 var coordinates = await _coordinatesService.GetAllCoordinatesAsync();
-                return Ok(new Response
+                var response = new
                 {
-                    Success = true,
-                    Message = "Coordinates retrieved successfully.",
-                    StatusCode = 200,
-                    Data = coordinates
-                });
+                    data = coordinates.Select(c => new
+                    {
+                        id = c.Id,
+                        WKT = c.WKT,
+                        Name = c.Name
+                    }).ToList()
+                };
+
+                return Ok(response);
             }
             catch (System.Exception ex)
             {
@@ -54,7 +59,7 @@ namespace basarsoft.Controllers
                     return NotFound(new Response
                     {
                         Success = false,
-                        Message = "Coordinates not found.",
+                        Message = "Coordinate not found.",
                         StatusCode = 404,
                         Data = null
                     });
@@ -63,9 +68,14 @@ namespace basarsoft.Controllers
                 return Ok(new Response
                 {
                     Success = true,
-                    Message = "Coordinates retrieved successfully.",
+                    Message = "Coordinate retrieved successfully.",
                     StatusCode = 200,
-                    Data = coordinate
+                    Data = new
+                    {
+                        id = coordinate.Id,
+                        WKT = coordinate.WKT,
+                        Name = coordinate.Name
+                    }
                 });
             }
             catch (System.Exception ex)
@@ -121,7 +131,7 @@ namespace basarsoft.Controllers
                     return BadRequest(new Response
                     {
                         Success = false,
-                        Message = "Invalid coordinates data or ID mismatch.",
+                        Message = "Invalid coordinate data or ID mismatch.",
                         StatusCode = 400,
                         Data = null
                     });
